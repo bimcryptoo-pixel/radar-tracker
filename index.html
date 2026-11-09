@@ -3,461 +3,260 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📡 BET TRACKER — BetSolution</title>
+<title>🎯 BET TRACKER — BetSolution</title>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  :root{
-    --bg:#000000; --bg2:#0a0a0a; --bg3:#111111; --bg4:#1a1a1a;
-    --border:#262626; --border2:#333333;
-    --text:#f2f2f2; --muted:#9a9a9a; --muted2:#6b6b6b;
-    --green:#22c55e; --green-bg:rgba(34,197,94,.14);
-    --red:#ef4444; --red-bg:rgba(239,68,68,.14);
-    --yellow:#eab308; --yellow-bg:rgba(234,179,8,.14);
-    --grey-bg:rgba(154,154,154,.16);
-    --accent:#22c55e;
-  }
-  html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px}
-  body{padding:16px;max-width:1560px;margin:0 auto}
-  /* header */
-  header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;padding:14px 18px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;margin-bottom:14px}
-  header.top h1{font-size:22px;font-weight:800;letter-spacing:.2px}
-  header.top .sub{color:var(--muted);font-size:13px;margin-top:4px}
-  header.top .sub b{color:var(--text)}
-  button.btn{background:var(--bg4);color:var(--text);border:1px solid var(--border2);border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer}
-  button.btn:hover{border-color:var(--green);color:var(--green)}
-  button.btn:disabled{opacity:.5;cursor:wait}
-  /* KPI cards */
-  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:14px}
-  .kpi{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
-  .kpi .lbl{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.8px;font-weight:700}
-  .kpi .val{font-size:24px;font-weight:800;margin-top:5px;font-variant-numeric:tabular-nums}
-  .kpi .val.pos{color:var(--green)} .kpi .val.neg{color:var(--red)}
-  .kpi .hint{color:var(--muted2);font-size:11px;margin-top:3px}
-  /* tabs */
-  .tabs{display:flex;gap:8px;margin-bottom:14px}
-  .tab{background:var(--bg2);border:1px solid var(--border);color:var(--muted);border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer}
-  .tab.active{color:var(--text);border-color:var(--green);background:var(--bg3)}
-  section.panel{display:none}
-  section.panel.active{display:block}
-  /* filters */
-  .filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
-  .filters input[type=text], .filters select{background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:8px;padding:9px 11px;font-size:13px}
-  .filters input[type=text]{flex:1;min-width:220px}
-  .count{color:var(--muted);font-size:12px;margin:6px 0 10px}
-  /* tables */
-  .tblwrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;background:var(--bg2);margin-bottom:18px}
-  table{border-collapse:collapse;width:100%;font-size:12.5px;white-space:nowrap}
-  thead th{background:var(--bg4);color:var(--muted);text-align:left;padding:9px 10px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border2);position:sticky;top:0}
-  tbody td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top;font-variant-numeric:tabular-nums}
-  tbody tr:hover{background:var(--bg3)}
-  tfoot td{padding:9px 10px;font-weight:800;background:var(--bg4);border-top:2px solid var(--border2)}
-  td.wrap, th.wrap{white-space:normal;min-width:180px}
-  td.det{white-space:normal;min-width:200px;max-width:340px;color:var(--muted)}
-  .num{text-align:right}
-  .pos{color:var(--green);font-weight:700}
-  .neg{color:var(--red);font-weight:700}
-  .muted{color:var(--muted)}
-  /* chips */
-  .chip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.4px}
-  .chip.green{background:var(--green-bg);color:var(--green)}
-  .chip.red{background:var(--red-bg);color:var(--red)}
-  .chip.void{background:var(--grey-bg);color:#c9c9c9}
-  .chip.pendente{background:var(--yellow-bg);color:var(--yellow)}
-  .tier{display:inline-block;padding:1px 7px;border-radius:6px;background:var(--bg4);border:1px solid var(--border2);font-weight:700;font-size:11px}
-  h3.an{font-size:15px;font-weight:800;margin:20px 0 8px}
-  h3.an:first-child{margin-top:4px}
-  .empty{padding:26px;text-align:center;color:var(--muted)}
-  .err{background:var(--red-bg);border:1px solid var(--red);color:#fecaca;border-radius:10px;padding:12px 14px;margin-bottom:12px;display:none}
-  footer.rodape{margin-top:8px;padding:14px 4px;color:var(--muted2);font-size:12px;border-top:1px solid var(--border);text-align:center}
-  .loading{padding:30px;text-align:center;color:var(--muted)}
-  @media (max-width:640px){ body{padding:10px} header.top h1{font-size:18px} .kpi .val{font-size:20px} }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #000; color: #e8e8e8; font-family: -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 14px; }
+  header { background: #0a0a0a; border-bottom: 1px solid #222; padding: 14px 18px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  header h1 { font-size: 20px; font-weight: 800; letter-spacing: .3px; }
+  header .sub { color: #888; font-size: 12px; }
+  header .spacer { flex: 1; }
+  .pill { background: #111; border: 1px solid #2a2a2a; border-radius: 999px; padding: 5px 12px; font-size: 12px; color: #bbb; }
+  .pill b { color: #fff; }
+  main { max-width: 1280px; margin: 0 auto; padding: 16px; }
+  .filtros { background: #0a0a0a; border: 1px solid #222; border-radius: 12px; padding: 12px; display: flex; flex-wrap: wrap; gap: 10px; align-items: end; margin-bottom: 14px; }
+  .campo { display: flex; flex-direction: column; gap: 4px; }
+  .campo label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: .5px; }
+  .campo select, .campo input { background: #141414; color: #eee; border: 1px solid #2c2c2c; border-radius: 8px; padding: 8px 10px; font-size: 13px; min-height: 36px; }
+  .campo input[type="number"] { width: 90px; }
+  .campo.busca { flex: 1; min-width: 180px; }
+  .btn { background: #1a1a1a; border: 1px solid #333; color: #eee; border-radius: 8px; padding: 8px 14px; cursor: pointer; font-size: 13px; min-height: 36px; }
+  .btn:hover { background: #222; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .kpi { background: #0a0a0a; border: 1px solid #222; border-radius: 12px; padding: 12px 14px; }
+  .kpi .rot { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: .5px; }
+  .kpi .val { font-size: 22px; font-weight: 800; margin-top: 4px; }
+  .kpi .det { font-size: 11px; color: #888; margin-top: 2px; }
+  .pos { color: #4ade80 !important; } .neg { color: #f87171 !important; }
+  .abas { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .aba { background: #0a0a0a; border: 1px solid #2a2a2a; color: #ccc; border-radius: 10px; padding: 10px 16px; cursor: pointer; font-size: 14px; font-weight: 600; }
+  .aba.on { background: #14532d; border-color: #22c55e; color: #fff; }
+  .card { background: #0a0a0a; border: 1px solid #222; border-radius: 12px; padding: 14px; margin-bottom: 14px; overflow-x: auto; }
+  .card h2 { font-size: 16px; margin-bottom: 4px; }
+  .card .hint { color: #888; font-size: 12px; margin-bottom: 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; color: #999; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; padding: 8px; border-bottom: 1px solid #262626; white-space: nowrap; }
+  td { padding: 8px; border-bottom: 1px solid #1a1a1a; vertical-align: top; }
+  tr:hover td { background: #0f0f0f; }
+  tfoot td { border-top: 2px solid #2c2c2c; border-bottom: none; font-weight: 800; background: #0d0d0d; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .st { font-weight: 700; font-size: 12px; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+  .st-green { background: #052e16; color: #4ade80; border: 1px solid #166534; }
+  .st-red { background: #2e0505; color: #f87171; border: 1px solid #7f1d1d; }
+  .st-void { background: #262626; color: #d4d4d4; border: 1px solid #525252; }
+  .st-pendente { background: #2e2505; color: #facc15; border: 1px solid #854d0e; }
+  .jogo { font-weight: 600; }
+  .muted { color: #888; font-size: 12px; }
+  .barra { height: 8px; background: #1c1c1c; border-radius: 99px; overflow: hidden; min-width: 70px; }
+  .barra i { display: block; height: 100%; background: #22c55e; }
+  .vazio { text-align: center; color: #777; padding: 28px 10px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 900px) { .grid2 { grid-template-columns: 1fr; } }
+  .erro { background: #2e0505; border: 1px solid #7f1d1d; color: #fca5a5; border-radius: 10px; padding: 12px; margin-bottom: 12px; display: none; }
 </style>
 </head>
 <body>
-
-<header class="top">
-  <div>
-    <h1>📡 BET TRACKER — BetSolution</h1>
-    <div class="sub" id="subtitulo">Carregando última varredura…</div>
-  </div>
-  <button class="btn" id="btnAtualizar" type="button">🔄 Atualizar</button>
+<header>
+  <h1>🎯 BET TRACKER</h1>
+  <span class="sub">Linhas do Radar · BetSolution · Bet365</span>
+  <div class="spacer"></div>
+  <span class="pill">Stake simulação <b>R$ 100,00</b></span>
+  <span class="pill" id="ultVarredura">Última varredura: —</span>
+  <button class="btn" id="btnAtualizar">🔄 Atualizar</button>
 </header>
+<main>
+  <div class="erro" id="erro"></div>
 
-<div class="err" id="erroBox"></div>
+  <section class="filtros">
+    <div class="campo busca"><label>🔎 Buscar (jogo, liga, mercado)</label><input id="fBusca" type="text" placeholder="Ex.: Corinthians, NBA, escanteios..."></div>
+    <div class="campo"><label>Esporte</label><select id="fEsporte"><option value="">Todos</option></select></div>
+    <div class="campo"><label>Status</label><select id="fStatus"><option value="">Todos</option><option value="pendente">⏳ Pendentes</option><option value="green">🟢 Green</option><option value="red">🔴 Red</option><option value="void">⚪ Void</option></select></div>
+    <div class="campo"><label>Tier</label><select id="fTier"><option value="">Todos</option><option value="T1">T1</option><option value="T2">T2</option><option value="T3">T3</option></select></div>
+    <div class="campo"><label>Tipo de mercado</label><select id="fTipo"><option value="">Todos</option><option>Principais</option><option>Props</option><option>Stats</option></select></div>
+    <div class="campo"><label>Fonte</label><select id="fFonte"><option value="">Todas</option><option value="radar">📡 Radar</option></select></div>
+    <div class="campo"><label>EV mín %</label><input id="fEvMin" type="number" step="0.1" placeholder="—"></div>
+    <div class="campo"><label>EV máx %</label><input id="fEvMax" type="number" step="0.1" placeholder="—"></div>
+    <div class="campo"><label>De</label><input id="fDe" type="date"></div>
+    <div class="campo"><label>Até</label><input id="fAte" type="date"></div>
+    <button class="btn" id="btnLimpar">🧹 Limpar</button>
+  </section>
 
-<div class="kpis" id="kpis">
-  <div class="kpi"><div class="lbl">Total de linhas</div><div class="val" id="kpiTotal">—</div></div>
-  <div class="kpi"><div class="lbl">Pendentes</div><div class="val" id="kpiPendentes">—</div></div>
-  <div class="kpi"><div class="lbl">Liquidadas</div><div class="val" id="kpiLiquidadas">—</div></div>
-  <div class="kpi"><div class="lbl">Winrate</div><div class="val" id="kpiWinrate">—</div><div class="hint">green ÷ (green + red)</div></div>
-  <div class="kpi"><div class="lbl">ROI simulação</div><div class="val" id="kpiRoi">—</div><div class="hint">sobre o volume liquidado</div></div>
-  <div class="kpi"><div class="lbl">Lucro simulação</div><div class="val" id="kpiLucro">—</div><div class="hint">stake R$ 100 / linha</div></div>
-  <div class="kpi"><div class="lbl">EV médio (liquidadas)</div><div class="val" id="kpiEvMedio">—</div></div>
-</div>
+  <section class="kpis" id="kpis"></section>
 
-<nav class="tabs">
-  <button class="tab active" id="tabLinhas" type="button" data-aba="linhas">📋 Linhas</button>
-  <button class="tab" id="tabAnalises" type="button" data-aba="analises">📊 Análises</button>
-</nav>
+  <nav class="abas">
+    <button class="aba on" data-aba="analises">📊 Análises</button>
+    <button class="aba" data-aba="linhas">📋 Linhas</button>
+  </nav>
 
-<section class="panel active" id="panelLinhas">
-  <div class="filters" id="filtros">
-    <input type="text" id="fBusca" placeholder="🔎 Buscar em jogo, mercado, seleção, liga…">
-    <select id="fStatus">
-      <option value="">Status: todas</option>
-      <option value="pendente">Pendente</option>
-      <option value="green">Green</option>
-      <option value="red">Red</option>
-      <option value="void">Void</option>
-    </select>
-    <select id="fEsporte"><option value="">Esporte: todos</option></select>
-    <select id="fTier">
-      <option value="">Tier: todos</option>
-      <option value="T1">T1</option>
-      <option value="T2">T2</option>
-      <option value="T3">T3</option>
-      <option value="T4">T4</option>
-    </select>
-    <select id="fFonte">
-      <option value="">Fonte: todas</option>
-      <option value="radar">Radar</option>
-      <option value="tracker">Tracker</option>
-      <option value="historico">Histórico</option>
-    </select>
+  <div id="aba-analises">
+    <div class="card">
+      <h2>🏆 Estudo por Esportes</h2>
+      <div class="hint">Onde o dinheiro rende por esporte — respeita os filtros acima. Winrate = greens ÷ (greens + reds); ROI sobre o total apostado nas liquidadas.</div>
+      <div id="tblEsportes"></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h2>🎯 Por Mercado</h2><div class="hint">Linhas liquidadas por mercado.</div><div id="tblMercado"></div></div>
+      <div class="card"><h2>🧩 Por Tipo de Mercado</h2><div class="hint">Principais × Props × Stats.</div><div id="tblTipo"></div></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h2>🥇 Por Tier</h2><div class="hint">Qualidade do sinal (T1/T2/T3).</div><div id="tblTier"></div></div>
+      <div class="card"><h2>📈 Por Faixa de EV</h2><div class="hint">O EV prometido × o resultado real.</div><div id="tblEv"></div></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h2>🎲 Por Faixa de Odd</h2><div class="hint">Odd da linha capturada.</div><div id="tblOdd"></div></div>
+      <div class="card"><h2>🏟️ Por Liga (top 15)</h2><div class="hint">Ligas com mais linhas liquidadas.</div><div id="tblLiga"></div></div>
+    </div>
   </div>
-  <div class="count" id="contadorLinhas"></div>
-  <div class="tblwrap">
-    <table id="tabelaLinhas">
-      <thead>
-        <tr>
-          <th>Data captura</th><th>Início</th><th>Esporte</th><th>Liga</th>
-          <th class="wrap">Jogo</th><th class="wrap">Mercado</th><th class="wrap">Seleção</th>
-          <th>Período</th><th>Tier</th><th class="num">Odd</th><th class="num">EV%</th>
-          <th class="num">FAIR</th><th class="num">CLV</th><th>Status</th><th class="wrap">Detalhe / Placar</th>
-        </tr>
-      </thead>
-      <tbody id="tbodyLinhas"><tr><td colspan="15" class="loading">Carregando linhas…</td></tr></tbody>
-    </table>
+
+  <div id="aba-linhas" style="display:none">
+    <div class="card">
+      <h2>📋 Linhas capturadas</h2>
+      <div class="hint" id="linhasResumo">—</div>
+      <div id="tblLinhas"></div>
+    </div>
   </div>
-</section>
-
-<section class="panel" id="panelAnalises">
-  <div id="analisesConteudo"><div class="loading">Carregando análises…</div></div>
-</section>
-
-<footer class="rodape">
-  Simulação com stake fixa de R$ 100 por linha · Linhas deduplicadas por jogo+mercado+seleção+período+casa+data
-</footer>
+</main>
 
 <script>
-"use strict";
-var SUPABASE_URL = "https://srenhrjrprufixoiqvlz.supabase.co";
-var SUPABASE_KEY = "sb_publishable_e08JBryAm6Pxx3Pp4aVLag_V1yO4dYM";
-var HEADERS = { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY };
+const SB = 'https://srenhrjrprufixoiqvlz.supabase.co';
+const KEY = 'sb_publishable_e08JBryAm6Pxx3Pp4aVLag_V1yO4dYM';
+const STAKE = 100;
+let TODAS = [];
 
-var LINHAS = [];
-var VARREDURAS = [];
+const $ = id => document.getElementById(id);
+const fmtR = v => (v < 0 ? '-R$ ' : 'R$ ') + Math.abs(v).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const fmtPct = v => (v > 0 ? '+' : '') + v.toFixed(1).replace('.', ',') + '%';
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
-/* ---------- utilidades ---------- */
-function esc(s){
-  if (s === null || s === undefined) return "—";
-  return String(s).replace(/[&<>"']/g, function(c){
-    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
-  });
+function lucroDe(l) {
+  if (l.retorno_sim != null) return Number(l.retorno_sim) - STAKE;
+  if (l.status === 'green') return STAKE * (Number(l.odd) - 1);
+  if (l.status === 'red') return -STAKE;
+  return 0;
 }
-function dash(v){ return (v === null || v === undefined || v === "") ? "—" : v; }
-function fmtBRL(v){
-  if (v === null || v === undefined || isNaN(v)) return "—";
-  return Number(v).toLocaleString("pt-BR", {style:"currency", currency:"BRL"});
-}
-function fmtNum(v, dec){
-  if (v === null || v === undefined || isNaN(v)) return "—";
-  return Number(v).toLocaleString("pt-BR", {minimumFractionDigits:dec, maximumFractionDigits:dec});
-}
-function fmtPct(v){
-  if (v === null || v === undefined || isNaN(v)) return "—";
-  return fmtNum(v, 1) + "%";
-}
-function fmtData(iso){
-  if (!iso) return "—";
-  var d = new Date(iso);
-  if (isNaN(d.getTime())) return "—";
-  return d.toLocaleString("pt-BR", {timeZone:"America/Sao_Paulo", day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit"});
-}
-function fmtOdd(v){
-  if (v === null || v === undefined || isNaN(v)) return "—";
-  return Number(v).toLocaleString("pt-BR", {minimumFractionDigits:2, maximumFractionDigits:2});
-}
-function fmtEv(v){
-  if (v === null || v === undefined || isNaN(v)) return "—";
-  var n = Number(v);
-  return (n > 0 ? "+" : "") + fmtNum(n, 1) + "%";
-}
-function stakeDe(l){ var s = Number(l.stake_sim); return isNaN(s) || s <= 0 ? 100 : s; }
-
-/* Lucro simulado de uma linha liquidada, conforme as regras:
-   - retorno_sim presente: green -> retorno_sim - stake_sim (demais status: retorno_sim - stake_sim também, se houver)
-   - green sem retorno_sim: stake*(odd-1) | red: -stake | void: 0 | pendente: null */
-function lucroDe(l){
-  if (l.status === "pendente") return null;
-  var stake = stakeDe(l);
-  if (l.retorno_sim !== null && l.retorno_sim !== undefined && !isNaN(Number(l.retorno_sim))){
-    return Number(l.retorno_sim) - stake;
-  }
-  if (l.status === "green"){
-    var odd = Number(l.odd);
-    return isNaN(odd) ? 0 : stake * (odd - 1);
-  }
-  if (l.status === "red") return -stake;
-  if (l.status === "void") return 0;
-  return null;
-}
-function isLiquidada(l){ return l.status === "green" || l.status === "red" || l.status === "void"; }
-
-/* Agrega um conjunto de linhas (conta todas em "linhas"; métricas só nas liquidadas) */
-function agregar(arr){
-  var g = { linhas: arr.length, liq: 0, green: 0, red: 0, void: 0, volume: 0, lucro: 0, evSoma: 0, evQtd: 0 };
-  arr.forEach(function(l){
-    if (!isLiquidada(l)) return;
-    g.liq++;
-    if (l.status === "green") g.green++;
-    else if (l.status === "red") g.red++;
-    else if (l.status === "void") g.void++;
-    if (l.status === "green" || l.status === "red") g.volume += stakeDe(l);
-    var lu = lucroDe(l);
-    if (lu !== null) g.lucro += lu;
-    if (l.ev !== null && l.ev !== undefined && !isNaN(Number(l.ev))){ g.evSoma += Number(l.ev); g.evQtd++; }
-  });
-  g.winrate = (g.green + g.red) > 0 ? (g.green / (g.green + g.red)) * 100 : null;
-  g.roi = g.volume > 0 ? (g.lucro / g.volume) * 100 : null;
-  g.evMedio = g.evQtd > 0 ? g.evSoma / g.evQtd : null;
-  return g;
-}
-function classeValor(v){ return v === null || v === undefined ? "" : (v >= 0 ? "pos" : "neg"); }
-
-/* ---------- carregamento ---------- */
-function fetchJson(url){
-  return fetch(url, { headers: HEADERS }).then(function(r){
-    if (!r.ok) throw new Error("HTTP " + r.status + " em " + url);
-    return r.json();
-  });
-}
-function carregar(){
-  var btn = document.getElementById("btnAtualizar");
-  btn.disabled = true; btn.textContent = "⏳ Atualizando…";
-  document.getElementById("erroBox").style.display = "none";
-  var p1 = fetchJson(SUPABASE_URL + "/rest/v1/radar_linhas?select=*&order=capturada_em.desc&limit=5000");
-  var p2 = fetchJson(SUPABASE_URL + "/rest/v1/radar_varreduras?select=*&order=iniciada_em.desc&limit=20");
-  return Promise.all([p1, p2]).then(function(res){
-    LINHAS = Array.isArray(res[0]) ? res[0] : [];
-    VARREDURAS = Array.isArray(res[1]) ? res[1] : [];
-    renderTudo();
-  }).catch(function(e){
-    var box = document.getElementById("erroBox");
-    box.textContent = "⚠️ Não foi possível carregar os dados do Supabase: " + e.message;
-    box.style.display = "block";
-  }).then(function(){
-    btn.disabled = false; btn.textContent = "🔄 Atualizar";
-  });
-}
-
-/* ---------- renderização ---------- */
-function renderTudo(){
-  renderSubtitulo();
-  renderKpis();
-  popularEsportes();
-  renderLinhas();
-  renderAnalises();
-}
-function renderSubtitulo(){
-  var el = document.getElementById("subtitulo");
-  if (!VARREDURAS.length){ el.textContent = "Nenhuma varredura registrada ainda."; return; }
-  var v = VARREDURAS[0];
-  el.innerHTML = "Última varredura: <b>" + esc(fmtData(v.iniciada_em)) + "</b>" +
-    " · Linhas vistas: <b>" + esc(dash(v.linhas_vistas)) + "</b>" +
-    " · Linhas novas: <b>" + esc(dash(v.linhas_novas)) + "</b>";
-}
-function renderKpis(){
-  var total = LINHAS.length;
-  var pendentes = LINHAS.filter(function(l){ return l.status === "pendente"; }).length;
-  var liq = LINHAS.filter(isLiquidada);
-  var agg = agregar(LINHAS);
-  document.getElementById("kpiTotal").textContent = total.toLocaleString("pt-BR");
-  document.getElementById("kpiPendentes").textContent = pendentes.toLocaleString("pt-BR");
-  document.getElementById("kpiLiquidadas").textContent = liq.length.toLocaleString("pt-BR");
-  document.getElementById("kpiWinrate").textContent = fmtPct(agg.winrate);
-  var roiEl = document.getElementById("kpiRoi");
-  roiEl.textContent = fmtPct(agg.roi);
-  roiEl.className = "val " + classeValor(agg.roi);
-  var lucroEl = document.getElementById("kpiLucro");
-  lucroEl.textContent = fmtBRL(agg.lucro);
-  lucroEl.className = "val " + classeValor(agg.lucro);
-  document.getElementById("kpiEvMedio").textContent = agg.evMedio === null ? "—" : fmtEv(agg.evMedio);
-}
-function popularEsportes(){
-  var sel = document.getElementById("fEsporte");
-  var atual = sel.value;
-  var esportes = {};
-  LINHAS.forEach(function(l){ if (l.esporte) esportes[l.esporte] = true; });
-  var lista = Object.keys(esportes).sort();
-  sel.innerHTML = '<option value="">Esporte: todos</option>' + lista.map(function(e){
-    return '<option value="' + esc(e) + '">' + esc(e) + "</option>";
-  }).join("");
-  sel.value = atual;
-}
-
-/* ----- aba Linhas ----- */
-function linhasFiltradas(){
-  var busca = document.getElementById("fBusca").value.trim().toLowerCase();
-  var status = document.getElementById("fStatus").value;
-  var esporte = document.getElementById("fEsporte").value;
-  var tier = document.getElementById("fTier").value;
-  var fonte = document.getElementById("fFonte").value;
-  return LINHAS.filter(function(l){
-    if (status && l.status !== status) return false;
-    if (esporte && l.esporte !== esporte) return false;
+function filtradas() {
+  const busca = $('fBusca').value.trim().toLowerCase();
+  const esp = $('fEsporte').value, st = $('fStatus').value, tier = $('fTier').value, tipo = $('fTipo').value, fonte = $('fFonte').value;
+  const evMin = parseFloat($('fEvMin').value), evMax = parseFloat($('fEvMax').value);
+  const de = $('fDe').value, ate = $('fAte').value;
+  return TODAS.filter(l => {
+    if (esp && l.esporte !== esp) return false;
+    if (st && l.status !== st) return false;
     if (tier && l.tier !== tier) return false;
+    if (tipo && l.tipo_mercado !== tipo) return false;
     if (fonte && l.fonte_coleta !== fonte) return false;
-    if (busca){
-      var alvo = [l.jogo, l.mercado, l.selecao, l.liga].filter(Boolean).join(" ").toLowerCase();
-      if (alvo.indexOf(busca) === -1) return false;
+    if (!isNaN(evMin) && (l.ev == null || Number(l.ev) < evMin)) return false;
+    if (!isNaN(evMax) && (l.ev == null || Number(l.ev) > evMax)) return false;
+    const dia = (l.inicio_jogo || l.capturada_em || '').slice(0, 10);
+    if (de && dia < de) return false;
+    if (ate && dia > ate) return false;
+    if (busca) {
+      const alvo = (l.jogo + ' ' + (l.liga||'') + ' ' + (l.mercado||'') + ' ' + (l.selecao||'')).toLowerCase();
+      if (!alvo.includes(busca)) return false;
     }
     return true;
   });
 }
-function chipStatus(st){
-  var mapa = { green:"GREEN", red:"RED", void:"VOID", pendente:"PENDENTE" };
-  var rot = mapa[st] || String(st || "—").toUpperCase();
-  var cls = (st === "green" || st === "red" || st === "void" || st === "pendente") ? st : "void";
-  return '<span class="chip ' + cls + '">' + esc(rot) + "</span>";
+function resumo(rows) {
+  const liq = rows.filter(l => ['green','red','void'].includes(l.status));
+  const g = liq.filter(l => l.status === 'green').length, r = liq.filter(l => l.status === 'red').length, v = liq.filter(l => l.status === 'void').length;
+  const lucro = liq.reduce((s, l) => s + lucroDe(l), 0);
+  const wr = (g + r) ? g / (g + r) * 100 : null;
+  const roi = liq.length ? lucro / (liq.length * STAKE) * 100 : null;
+  const evs = rows.filter(l => l.ev != null).map(l => Number(l.ev));
+  const evMedio = evs.length ? evs.reduce((a, b) => a + b, 0) / evs.length : null;
+  const oddMed = liq.length ? liq.reduce((s, l) => s + Number(l.odd || 0), 0) / liq.length : null;
+  return { n: rows.length, pend: rows.length - liq.length, liq: liq.length, g, r, v, lucro, wr, roi, evMedio, oddMed };
 }
-function renderLinhas(){
-  var arr = linhasFiltradas();
-  document.getElementById("contadorLinhas").textContent =
-    arr.length.toLocaleString("pt-BR") + " linha(s) exibida(s) de " + LINHAS.length.toLocaleString("pt-BR") + " no total";
-  var tb = document.getElementById("tbodyLinhas");
-  if (!arr.length){
-    tb.innerHTML = '<tr><td colspan="15" class="empty">Nenhuma linha encontrada com esses filtros.</td></tr>';
-    return;
+function renderKpis(rows) {
+  const s = resumo(rows);
+  const cls = s.lucro > 0 ? 'pos' : (s.lucro < 0 ? 'neg' : '');
+  $('kpis').innerHTML = `
+    <div class="kpi"><div class="rot">📋 Linhas</div><div class="val">${s.n}</div><div class="det">${s.pend} pendentes · ${s.liq} liquidadas</div></div>
+    <div class="kpi"><div class="rot">🎯 Winrate</div><div class="val">${s.wr == null ? '—' : s.wr.toFixed(1).replace('.', ',') + '%'}</div><div class="det">${s.g} green · ${s.r} red · ${s.v} void</div></div>
+    <div class="kpi"><div class="rot">💰 Lucro simulação</div><div class="val ${cls}">${fmtR(s.lucro)}</div><div class="det">stake de R$ 100 por linha</div></div>
+    <div class="kpi"><div class="rot">📈 ROI</div><div class="val ${cls}">${s.roi == null ? '—' : fmtPct(s.roi)}</div><div class="det">sobre ${fmtR(s.liq * STAKE)} apostados</div></div>
+    <div class="kpi"><div class="rot">⚡ EV médio</div><div class="val">${s.evMedio == null ? '—' : fmtPct(s.evMedio)}</div><div class="det">das linhas capturadas</div></div>
+    <div class="kpi"><div class="rot">🎲 Odd média</div><div class="val">${s.oddMed == null ? '—' : s.oddMed.toFixed(2).replace('.', ',')}</div><div class="det">das liquidadas</div></div>`;
+}
+function tabelaGrupos(rows, chaveFn, limite) {
+  const grupos = {};
+  rows.forEach(l => { const k = chaveFn(l) || '—'; (grupos[k] = grupos[k] || []).push(l); });
+  let arr = Object.entries(grupos).map(([k, rs]) => ({ k, ...resumo(rs) }));
+  arr.sort((a, b) => (b.roi ?? -999) - (a.roi ?? -999));
+  if (limite) arr = arr.slice(0, limite);
+  if (!arr.length) return '<div class="vazio">Sem linhas neste recorte.</div>';
+  const tot = resumo(rows);
+  const linhas = arr.map(a => `<tr>
+    <td class="jogo">${esc(a.k)}</td>
+    <td class="num">${a.n}</td><td class="num">${a.liq}</td>
+    <td class="num">${a.wr == null ? '—' : a.wr.toFixed(1).replace('.', ',') + '%'}</td>
+    <td><div class="barra"><i style="width:${a.wr == null ? 0 : a.wr.toFixed(0)}%"></i></div></td>
+    <td class="num">${a.oddMed == null ? '—' : a.oddMed.toFixed(2).replace('.', ',')}</td>
+    <td class="num">${a.evMedio == null ? '—' : fmtPct(a.evMedio)}</td>
+    <td class="num ${a.lucro > 0 ? 'pos' : (a.lucro < 0 ? 'neg' : '')}">${fmtR(a.lucro)}</td>
+    <td class="num ${a.roi != null && a.roi > 0 ? 'pos' : (a.roi != null && a.roi < 0 ? 'neg' : '')}">${a.roi == null ? '—' : fmtPct(a.roi)}</td></tr>`).join('');
+  return `<table><thead><tr><th>Grupo</th><th class="num">Linhas</th><th class="num">Liq.</th><th class="num">Winrate</th><th style="min-width:80px"></th><th class="num">Odd méd.</th><th class="num">EV méd.</th><th class="num">Lucro sim.</th><th class="num">ROI</th></tr></thead>
+  <tbody>${linhas}</tbody>
+  <tfoot><tr><td>TOTAL</td><td class="num">${tot.n}</td><td class="num">${tot.liq}</td><td class="num">${tot.wr == null ? '—' : tot.wr.toFixed(1).replace('.', ',') + '%'}</td><td></td><td class="num">${tot.oddMed == null ? '—' : tot.oddMed.toFixed(2).replace('.', ',')}</td><td class="num">${tot.evMedio == null ? '—' : fmtPct(tot.evMedio)}</td><td class="num">${fmtR(tot.lucro)}</td><td class="num">${tot.roi == null ? '—' : fmtPct(tot.roi)}</td></tr></tfoot></table>`;
+}
+function faixaEv(l) { const e = Number(l.ev); if (l.ev == null) return 'Sem EV'; if (e < 3) return 'EV < 3%'; if (e < 5) return 'EV 3–5%'; if (e < 8) return 'EV 5–8%'; if (e < 12) return 'EV 8–12%'; return 'EV 12%+'; }
+function faixaOdd(l) { const o = Number(l.odd); if (!o) return '—'; if (o < 1.70) return '1,40–1,70'; if (o < 2.00) return '1,70–2,00'; if (o < 2.50) return '2,00–2,50'; return '2,50–4,00'; }
+function renderAnalises(rows) {
+  $('tblEsportes').innerHTML = tabelaGrupos(rows, l => l.esporte);
+  $('tblMercado').innerHTML = tabelaGrupos(rows, l => l.mercado);
+  $('tblTipo').innerHTML = tabelaGrupos(rows, l => l.tipo_mercado);
+  $('tblTier').innerHTML = tabelaGrupos(rows, l => l.tier);
+  $('tblEv').innerHTML = tabelaGrupos(rows, faixaEv);
+  $('tblOdd').innerHTML = tabelaGrupos(rows, faixaOdd);
+  $('tblLiga').innerHTML = tabelaGrupos(rows.filter(l => ['green','red','void'].includes(l.status)), l => l.liga, 15);
+}
+const STMAP = { green: ['🟢 GREEN', 'st-green'], red: ['🔴 RED', 'st-red'], void: ['⚪ VOID', 'st-void'], pendente: ['⏳ PENDENTE', 'st-pendente'] };
+function renderLinhas(rows) {
+  const ord = [...rows].sort((a, b) => String(b.inicio_jogo || '').localeCompare(String(a.inicio_jogo || '')));
+  $('linhasResumo').textContent = ord.length + ' linha(s) no recorte atual · mais recentes primeiro';
+  if (!ord.length) { $('tblLinhas').innerHTML = '<div class="vazio">Nenhuma linha neste recorte.</div>'; return; }
+  $('tblLinhas').innerHTML = `<table><thead><tr><th>Jogo</th><th>Início</th><th>Mercado · Seleção</th><th>Tier</th><th class="num">Odd</th><th class="num">EV</th><th>Status</th><th>Detalhe</th></tr></thead><tbody>` +
+    ord.map(l => {
+      const [rot, cls] = STMAP[l.status] || STMAP.pendente;
+      const ini = l.inicio_jogo ? new Date(l.inicio_jogo).toLocaleString('pt-BR', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'}) : '—';
+      return `<tr><td><div class="jogo">${esc(l.jogo)}</div><div class="muted">${esc(l.esporte || '')} · ${esc(l.liga || '')} · ${esc(l.casa || '')}</div></td>
+      <td class="muted" style="white-space:nowrap">${ini}</td>
+      <td><div>${esc(l.mercado || '')}</div><div class="muted">${esc(l.selecao || '')}${l.periodo ? ' · ' + esc(l.periodo) : ''}</div></td>
+      <td>${esc(l.tier || '—')}</td>
+      <td class="num">${l.odd != null ? Number(l.odd).toFixed(2).replace('.', ',') : '—'}</td>
+      <td class="num">${l.ev != null ? fmtPct(Number(l.ev)) : '—'}</td>
+      <td><span class="st ${cls}">${rot}</span></td>
+      <td class="muted">${esc(l.detalhe || '')}</td></tr>`;
+    }).join('') + '</tbody></table>';
+}
+function aplicar() { const rows = filtradas(); renderKpis(rows); renderAnalises(rows); renderLinhas(rows); }
+async function carregar() {
+  $('erro').style.display = 'none';
+  try {
+    const r = await fetch(SB + '/rest/v1/radar_linhas?select=*&order=capturada_em.desc&limit=5000', { headers: { apikey: KEY, Authorization: 'Bearer ' + KEY } });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    TODAS = await r.json();
+    const esportes = [...new Set(TODAS.map(l => l.esporte).filter(Boolean))].sort();
+    const sel = $('fEsporte'); const atual = sel.value;
+    sel.innerHTML = '<option value="">Todos</option>' + esportes.map(e => `<option>${esc(e)}</option>`).join('');
+    sel.value = atual;
+    const rv = await fetch(SB + '/rest/v1/radar_varreduras?select=criado_em&order=criado_em.desc&limit=1', { headers: { apikey: KEY, Authorization: 'Bearer ' + KEY } });
+    if (rv.ok) { const v = await rv.json(); if (v.length) $('ultVarredura').innerHTML = 'Última varredura: <b>' + new Date(v[0].criado_em).toLocaleString('pt-BR') + '</b>'; }
+    aplicar();
+  } catch (e) {
+    $('erro').textContent = '⚠️ Não consegui carregar as linhas agora (' + e.message + '). Toque em Atualizar para tentar de novo.';
+    $('erro').style.display = 'block';
   }
-  tb.innerHTML = arr.map(function(l){
-    var det = [l.detalhe, l.placar].filter(function(x){ return x !== null && x !== undefined && x !== ""; }).join(" · ");
-    return "<tr>" +
-      "<td>" + esc(fmtData(l.capturada_em)) + "</td>" +
-      "<td>" + esc(fmtData(l.inicio_jogo)) + "</td>" +
-      "<td>" + esc(dash(l.esporte)) + "</td>" +
-      "<td>" + esc(dash(l.liga)) + "</td>" +
-      '<td class="wrap">' + esc(dash(l.jogo)) + "</td>" +
-      '<td class="wrap">' + esc(dash(l.mercado)) + "</td>" +
-      '<td class="wrap">' + esc(dash(l.selecao)) + "</td>" +
-      "<td>" + esc(dash(l.periodo)) + "</td>" +
-      "<td>" + (l.tier ? '<span class="tier">' + esc(l.tier) + "</span>" : "—") + "</td>" +
-      '<td class="num">' + esc(fmtOdd(l.odd)) + "</td>" +
-      '<td class="num">' + esc(fmtEv(l.ev)) + "</td>" +
-      '<td class="num">' + esc(fmtOdd(l.odd_fair)) + "</td>" +
-      '<td class="num">' + (l.clv === null || l.clv === undefined ? "—" : esc(fmtEv(l.clv))) + "</td>" +
-      "<td>" + chipStatus(l.status) + "</td>" +
-      '<td class="det">' + (det ? esc(det) : "—") + "</td>" +
-      "</tr>";
-  }).join("");
 }
-
-/* ----- aba Análises ----- */
-function agruparPor(arr, fnChave){
-  var mapa = {};
-  arr.forEach(function(l){
-    var k = fnChave(l);
-    if (k === null || k === undefined || k === "") k = "—";
-    if (!mapa[k]) mapa[k] = [];
-    mapa[k].push(l);
-  });
-  return mapa;
-}
-function faixaEv(l){
-  var ev = Number(l.ev);
-  if (l.ev === null || l.ev === undefined || isNaN(ev)) return "Sem EV";
-  if (ev < 5) return "3–5";
-  if (ev < 8) return "5–8";
-  if (ev < 12) return "8–12";
-  return "12+";
-}
-function faixaOdd(l){
-  var o = Number(l.odd);
-  if (l.odd === null || l.odd === undefined || isNaN(o)) return "Sem odd";
-  if (o < 1.70) return "1.40–1.70";
-  if (o < 2.00) return "1.70–2.00";
-  if (o < 2.50) return "2.00–2.50";
-  return "2.50–4.00";
-}
-function tabelaAnalise(titulo, mapa, liquidadas){
-  var chaves = Object.keys(mapa);
-  var linhasAgg = chaves.map(function(k){ return { chave: k, agg: agregar(mapa[k]) }; });
-  linhasAgg.sort(function(a, b){
-    var ra = a.agg.roi === null ? -Infinity : a.agg.roi;
-    var rb = b.agg.roi === null ? -Infinity : b.agg.roi;
-    return rb - ra;
-  });
-  function celulaAgg(a){
-    return "<td>" + a.linhas.toLocaleString("pt-BR") + "</td>" +
-      "<td>" + a.liq.toLocaleString("pt-BR") + "</td>" +
-      '<td class="pos">' + a.green.toLocaleString("pt-BR") + "</td>" +
-      '<td class="neg">' + a.red.toLocaleString("pt-BR") + "</td>" +
-      "<td>" + a.void.toLocaleString("pt-BR") + "</td>" +
-      "<td>" + fmtPct(a.winrate) + "</td>" +
-      '<td class="num">' + fmtBRL(a.volume) + "</td>" +
-      '<td class="num ' + classeValor(a.lucro) + '">' + fmtBRL(a.lucro) + "</td>" +
-      '<td class="num ' + classeValor(a.roi) + '">' + fmtPct(a.roi) + "</td>";
-  }
-  var corpo = linhasAgg.map(function(item){
-    return "<tr><td>" + esc(item.chave) + "</td>" + celulaAgg(item.agg) + "</tr>";
-  }).join("");
-  var total = agregar(liquidadas);
-  total.linhas = liquidadas.length;
-  var rodape = "<tr><td>TOTAL</td>" + celulaAgg(total) + "</tr>";
-  return '<h3 class="an">' + esc(titulo) + "</h3>" +
-    '<div class="tblwrap"><table><thead><tr>' +
-    "<th>Recorte</th><th>Linhas</th><th>Liquidadas</th><th>Green</th><th>Red</th><th>Void</th><th>Winrate</th>" +
-    '<th class="num">Volume sim (R$)</th><th class="num">Lucro sim (R$)</th><th class="num">ROI</th>' +
-    "</tr></thead><tbody>" + corpo + "</tbody><tfoot>" + rodape + "</tfoot></table></div>";
-}
-function renderAnalises(){
-  var cont = document.getElementById("analisesConteudo");
-  var liquidadas = LINHAS.filter(isLiquidada);
-  if (!liquidadas.length){
-    cont.innerHTML = '<div class="empty">Ainda não há linhas liquidadas para analisar. As análises aparecem assim que as primeiras linhas forem liquidadas (green/red/void).</div>';
-    return;
-  }
-  var porLiga = agruparPor(liquidadas, function(l){ return l.liga; });
-  var topLigas = Object.keys(porLiga).sort(function(a, b){ return porLiga[b].length - porLiga[a].length; }).slice(0, 15);
-  var mapaTopLigas = {};
-  topLigas.forEach(function(k){ mapaTopLigas[k] = porLiga[k]; });
-
-  cont.innerHTML =
-    tabelaAnalise("⚽ Por esporte", agruparPor(liquidadas, function(l){ return l.esporte; }), liquidadas) +
-    tabelaAnalise("🎯 Por mercado", agruparPor(liquidadas, function(l){ return l.mercado; }), liquidadas) +
-    tabelaAnalise("🧩 Por tipo de mercado", agruparPor(liquidadas, function(l){ return l.tipo_mercado; }), liquidadas) +
-    tabelaAnalise("🏅 Por Tier", agruparPor(liquidadas, function(l){ return l.tier; }), liquidadas) +
-    tabelaAnalise("📈 Por faixa de EV", agruparPor(liquidadas, faixaEv), liquidadas) +
-    tabelaAnalise("🎲 Por faixa de odd", agruparPor(liquidadas, faixaOdd), liquidadas) +
-    tabelaAnalise("🏆 Por liga (top 15 por nº de liquidadas)", mapaTopLigas, liquidadas);
-}
-
-/* ---------- eventos ---------- */
-document.getElementById("btnAtualizar").addEventListener("click", carregar);
-["fBusca", "fStatus", "fEsporte", "fTier", "fFonte"].forEach(function(id){
-  var el = document.getElementById(id);
-  el.addEventListener("input", renderLinhas);
-  el.addEventListener("change", renderLinhas);
-});
-document.querySelectorAll(".tab").forEach(function(tab){
-  tab.addEventListener("click", function(){
-    document.querySelectorAll(".tab").forEach(function(t){ t.classList.remove("active"); });
-    document.querySelectorAll("section.panel").forEach(function(p){ p.classList.remove("active"); });
-    tab.classList.add("active");
-    document.getElementById(tab.getAttribute("data-aba") === "linhas" ? "panelLinhas" : "panelAnalises").classList.add("active");
-  });
-});
-
+document.querySelectorAll('.aba').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.aba').forEach(x => x.classList.remove('on')); b.classList.add('on');
+  $('aba-analises').style.display = b.dataset.aba === 'analises' ? '' : 'none';
+  $('aba-linhas').style.display = b.dataset.aba === 'linhas' ? '' : 'none';
+}));
+['fBusca','fEsporte','fStatus','fTier','fTipo','fFonte','fEvMin','fEvMax','fDe','fAte'].forEach(id => { $(id).addEventListener('input', aplicar); $(id).addEventListener('change', aplicar); });
+$('btnLimpar').addEventListener('click', () => { ['fBusca','fEsporte','fStatus','fTier','fTipo','fFonte','fEvMin','fEvMax','fDe','fAte'].forEach(id => $(id).value = ''); aplicar(); });
+$('btnAtualizar').addEventListener('click', carregar);
 carregar();
 </script>
 </body>
