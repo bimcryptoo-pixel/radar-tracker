@@ -60,7 +60,7 @@
   <h1>🎯 BET TRACKER</h1>
   <span class="sub">Linhas do Radar · BetSolution · Bet365</span>
   <div class="spacer"></div>
-  <span class="pill">Stake simulação <b>R$ 100,00</b></span>
+  <span class="pill">Stake por linha <b id="pillStake">R$ 100,00</b> (editável nos filtros)</span>
   <span class="pill" id="ultVarredura">Última varredura: —</span>
   <button class="btn" id="btnAtualizar">🔄 Atualizar</button>
 </header>
@@ -76,6 +76,7 @@
     <div class="campo"><label>Fonte</label><select id="fFonte"><option value="">Todas</option><option value="radar">📡 Radar</option></select></div>
     <div class="campo"><label>EV mín %</label><input id="fEvMin" type="number" step="0.1" placeholder="—"></div>
     <div class="campo"><label>EV máx %</label><input id="fEvMax" type="number" step="0.1" placeholder="—"></div>
+    <div class="campo"><label>💰 Stake por linha (R$)</label><input id="fStake" type="number" step="1" min="1" value="100"></div>
     <div class="campo"><label>De</label><input id="fDe" type="date"></div>
     <div class="campo"><label>Até</label><input id="fAte" type="date"></div>
     <button class="btn" id="btnLimpar">🧹 Limpar</button>
@@ -120,7 +121,8 @@
 <script>
 const SB = 'https://srenhrjrprufixoiqvlz.supabase.co';
 const KEY = 'sb_publishable_e08JBryAm6Pxx3Pp4aVLag_V1yO4dYM';
-const STAKE = 100;
+const STAKE_BASE = 100; // retorno_sim gravado no banco é sempre referente a R$ 100
+let STAKE = parseFloat(localStorage.getItem('bt_stake')) || 100;
 let TODAS = [];
 
 const $ = id => document.getElementById(id);
@@ -129,7 +131,7 @@ const fmtPct = v => (v > 0 ? '+' : '') + v.toFixed(1).replace('.', ',') + '%';
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 function lucroDe(l) {
-  if (l.retorno_sim != null) return Number(l.retorno_sim) - STAKE;
+  if (l.retorno_sim != null) return Number(l.retorno_sim) / STAKE_BASE * STAKE - STAKE;
   if (l.status === 'green') return STAKE * (Number(l.odd) - 1);
   if (l.status === 'red') return -STAKE;
   return 0;
@@ -174,7 +176,7 @@ function renderKpis(rows) {
   $('kpis').innerHTML = `
     <div class="kpi"><div class="rot">📋 Linhas</div><div class="val">${s.n}</div><div class="det">${s.pend} pendentes · ${s.liq} liquidadas</div></div>
     <div class="kpi"><div class="rot">🎯 Winrate</div><div class="val">${s.wr == null ? '—' : s.wr.toFixed(1).replace('.', ',') + '%'}</div><div class="det">${s.g} green · ${s.r} red · ${s.v} void</div></div>
-    <div class="kpi"><div class="rot">💰 Lucro simulação</div><div class="val ${cls}">${fmtR(s.lucro)}</div><div class="det">stake de R$ 100 por linha</div></div>
+    <div class="kpi"><div class="rot">💰 Lucro simulação</div><div class="val ${cls}">${fmtR(s.lucro)}</div><div class="det">stake de ${fmtR(STAKE)} por linha</div></div>
     <div class="kpi"><div class="rot">📈 ROI</div><div class="val ${cls}">${s.roi == null ? '—' : fmtPct(s.roi)}</div><div class="det">sobre ${fmtR(s.liq * STAKE)} apostados</div></div>
     <div class="kpi"><div class="rot">⚡ EV médio</div><div class="val">${s.evMedio == null ? '—' : fmtPct(s.evMedio)}</div><div class="det">das linhas capturadas</div></div>
     <div class="kpi"><div class="rot">🎲 Odd média</div><div class="val">${s.oddMed == null ? '—' : s.oddMed.toFixed(2).replace('.', ',')}</div><div class="det">das liquidadas</div></div>`;
@@ -255,6 +257,15 @@ document.querySelectorAll('.aba').forEach(b => b.addEventListener('click', () =>
   $('aba-linhas').style.display = b.dataset.aba === 'linhas' ? '' : 'none';
 }));
 ['fBusca','fEsporte','fStatus','fTier','fTipo','fFonte','fEvMin','fEvMax','fDe','fAte'].forEach(id => { $(id).addEventListener('input', aplicar); $(id).addEventListener('change', aplicar); });
+$('fStake').value = STAKE;
+$('pillStake').textContent = fmtR(STAKE);
+$('fStake').addEventListener('input', () => {
+  const v = parseFloat($('fStake').value);
+  STAKE = (v && v > 0) ? v : 100;
+  localStorage.setItem('bt_stake', STAKE);
+  $('pillStake').textContent = fmtR(STAKE);
+  aplicar();
+});
 $('btnLimpar').addEventListener('click', () => { ['fBusca','fEsporte','fStatus','fTier','fTipo','fFonte','fEvMin','fEvMax','fDe','fAte'].forEach(id => $(id).value = ''); aplicar(); });
 $('btnAtualizar').addEventListener('click', carregar);
 carregar();
