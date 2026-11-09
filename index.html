@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📡 BET TRACKER — BetSolution</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#000000; --bg2:#0a0a0a; --bg3:#111111; --bg4:#1a1a1a;
+    --border:#262626; --border2:#333333;
+    --text:#f2f2f2; --muted:#9a9a9a; --muted2:#6b6b6b;
+    --green:#22c55e; --green-bg:rgba(34,197,94,.14);
+    --red:#ef4444; --red-bg:rgba(239,68,68,.14);
+    --yellow:#eab308; --yellow-bg:rgba(234,179,8,.14);
+    --grey-bg:rgba(154,154,154,.16);
+    --accent:#22c55e;
+  }
+  html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px}
+  body{padding:16px;max-width:1560px;margin:0 auto}
+  /* header */
+  header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;padding:14px 18px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;margin-bottom:14px}
+  header.top h1{font-size:22px;font-weight:800;letter-spacing:.2px}
+  header.top .sub{color:var(--muted);font-size:13px;margin-top:4px}
+  header.top .sub b{color:var(--text)}
+  button.btn{background:var(--bg4);color:var(--text);border:1px solid var(--border2);border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer}
+  button.btn:hover{border-color:var(--green);color:var(--green)}
+  button.btn:disabled{opacity:.5;cursor:wait}
+  /* KPI cards */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:14px}
+  .kpi{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+  .kpi .lbl{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.8px;font-weight:700}
+  .kpi .val{font-size:24px;font-weight:800;margin-top:5px;font-variant-numeric:tabular-nums}
+  .kpi .val.pos{color:var(--green)} .kpi .val.neg{color:var(--red)}
+  .kpi .hint{color:var(--muted2);font-size:11px;margin-top:3px}
+  /* tabs */
+  .tabs{display:flex;gap:8px;margin-bottom:14px}
+  .tab{background:var(--bg2);border:1px solid var(--border);color:var(--muted);border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer}
+  .tab.active{color:var(--text);border-color:var(--green);background:var(--bg3)}
+  section.panel{display:none}
+  section.panel.active{display:block}
+  /* filters */
+  .filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+  .filters input[type=text], .filters select{background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:8px;padding:9px 11px;font-size:13px}
+  .filters input[type=text]{flex:1;min-width:220px}
+  .count{color:var(--muted);font-size:12px;margin:6px 0 10px}
+  /* tables */
+  .tblwrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;background:var(--bg2);margin-bottom:18px}
+  table{border-collapse:collapse;width:100%;font-size:12.5px;white-space:nowrap}
+  thead th{background:var(--bg4);color:var(--muted);text-align:left;padding:9px 10px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border2);position:sticky;top:0}
+  tbody td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top;font-variant-numeric:tabular-nums}
+  tbody tr:hover{background:var(--bg3)}
+  tfoot td{padding:9px 10px;font-weight:800;background:var(--bg4);border-top:2px solid var(--border2)}
+  td.wrap, th.wrap{white-space:normal;min-width:180px}
+  td.det{white-space:normal;min-width:200px;max-width:340px;color:var(--muted)}
+  .num{text-align:right}
+  .pos{color:var(--green);font-weight:700}
+  .neg{color:var(--red);font-weight:700}
+  .muted{color:var(--muted)}
+  /* chips */
+  .chip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.4px}
+  .chip.green{background:var(--green-bg);color:var(--green)}
+  .chip.red{background:var(--red-bg);color:var(--red)}
+  .chip.void{background:var(--grey-bg);color:#c9c9c9}
+  .chip.pendente{background:var(--yellow-bg);color:var(--yellow)}
+  .tier{display:inline-block;padding:1px 7px;border-radius:6px;background:var(--bg4);border:1px solid var(--border2);font-weight:700;font-size:11px}
+  h3.an{font-size:15px;font-weight:800;margin:20px 0 8px}
+  h3.an:first-child{margin-top:4px}
+  .empty{padding:26px;text-align:center;color:var(--muted)}
+  .err{background:var(--red-bg);border:1px solid var(--red);color:#fecaca;border-radius:10px;padding:12px 14px;margin-bottom:12px;display:none}
+  footer.rodape{margin-top:8px;padding:14px 4px;color:var(--muted2);font-size:12px;border-top:1px solid var(--border);text-align:center}
+  .loading{padding:30px;text-align:center;color:var(--muted)}
+  @media (max-width:640px){ body{padding:10px} header.top h1{font-size:18px} .kpi .val{font-size:20px} }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div>
+    <h1>📡 BET TRACKER — BetSolution</h1>
+    <div class="sub" id="subtitulo">Carregando última varredura…</div>
+  </div>
+  <button class="btn" id="btnAtualizar" type="button">🔄 Atualizar</button>
+</header>
+
+<div class="err" id="erroBox"></div>
+
+<div class="kpis" id="kpis">
+  <div class="kpi"><div class="lbl">Total de linhas</div><div class="val" id="kpiTotal">—</div></div>
+  <div class="kpi"><div class="lbl">Pendentes</div><div class="val" id="kpiPendentes">—</div></div>
+  <div class="kpi"><div class="lbl">Liquidadas</div><div class="val" id="kpiLiquidadas">—</div></div>
+  <div class="kpi"><div class="lbl">Winrate</div><div class="val" id="kpiWinrate">—</div><div class="hint">green ÷ (green + red)</div></div>
+  <div class="kpi"><div class="lbl">ROI simulação</div><div class="val" id="kpiRoi">—</div><div class="hint">sobre o volume liquidado</div></div>
+  <div class="kpi"><div class="lbl">Lucro simulação</div><div class="val" id="kpiLucro">—</div><div class="hint">stake R$ 100 / linha</div></div>
+  <div class="kpi"><div class="lbl">EV médio (liquidadas)</div><div class="val" id="kpiEvMedio">—</div></div>
+</div>
+
+<nav class="tabs">
+  <button class="tab active" id="tabLinhas" type="button" data-aba="linhas">📋 Linhas</button>
+  <button class="tab" id="tabAnalises" type="button" data-aba="analises">📊 Análises</button>
+</nav>
+
+<section class="panel active" id="panelLinhas">
+  <div class="filters" id="filtros">
+    <input type="text" id="fBusca" placeholder="🔎 Buscar em jogo, mercado, seleção, liga…">
+    <select id="fStatus">
+      <option value="">Status: todas</option>
+      <option value="pendente">Pendente</option>
+      <option value="green">Green</option>
+      <option value="red">Red</option>
+      <option value="void">Void</option>
+    </select>
+    <select id="fEsporte"><option value="">Esporte: todos</option></select>
+    <select id="fTier">
+      <option value="">Tier: todos</option>
+      <option value="T1">T1</option>
+      <option value="T2">T2</option>
+      <option value="T3">T3</option>
+      <option value="T4">T4</option>
+    </select>
+    <select id="fFonte">
+      <option value="">Fonte: todas</option>
+      <option value="radar">Radar</option>
+      <option value="tracker">Tracker</option>
+      <option value="historico">Histórico</option>
+    </select>
+  </div>
+  <div class="count" id="contadorLinhas"></div>
+  <div class="tblwrap">
+    <table id="tabelaLinhas">
+      <thead>
+        <tr>
+          <th>Data captura</th><th>Início</th><th>Esporte</th><th>Liga</th>
+          <th class="wrap">Jogo</th><th class="wrap">Mercado</th><th class="wrap">Seleção</th>
+          <th>Período</th><th>Tier</th><th class="num">Odd</th><th class="num">EV%</th>
+          <th class="num">FAIR</th><th class="num">CLV</th><th>Status</th><th class="wrap">Detalhe / Placar</th>
+        </tr>
+      </thead>
+      <tbody id="tbodyLinhas"><tr><td colspan="15" class="loading">Carregando linhas…</td></tr></tbody>
+    </table>
+  </div>
+</section>
+
+<section class="panel" id="panelAnalises">
+  <div id="analisesConteudo"><div class="loading">Carregando análises…</div></div>
+</section>
+
+<footer class="rodape">
+  Simulação com stake fixa de R$ 100 por linha · Linhas deduplicadas por jogo+mercado+seleção+período+casa+data
+</footer>
+
+<script>
+"use strict";
+var SUPABASE_URL = "https://srenhrjrprufixoiqvlz.supabase.co";
+var SUPABASE_KEY = "sb_publishable_e08JBryAm6Pxx3Pp4aVLag_V1yO4dYM";
+var HEADERS = { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY };
+
+var LINHAS = [];
+var VARREDURAS = [];
+
+/* ---------- utilidades ---------- */
+function esc(s){
+  if (s === null || s === undefined) return "—";
+  return String(s).replace(/[&<>"']/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+  });
+}
+function dash(v){ return (v === null || v === undefined || v === "") ? "—" : v; }
+function fmtBRL(v){
+  if (v === null || v === undefined || isNaN(v)) return "—";
+  return Number(v).toLocaleString("pt-BR", {style:"currency", currency:"BRL"});
+}
+function fmtNum(v, dec){
+  if (v === null || v === undefined || isNaN(v)) return "—";
+  return Number(v).toLocaleString("pt-BR", {minimumFractionDigits:dec, maximumFractionDigits:dec});
+}
+function fmtPct(v){
+  if (v === null || v === undefined || isNaN(v)) return "—";
+  return fmtNum(v, 1) + "%";
+}
+function fmtData(iso){
+  if (!iso) return "—";
+  var d = new Date(iso);
+  if (isNaN(d.getTime())) return "—";
+  return d.toLocaleString("pt-BR", {timeZone:"America/Sao_Paulo", day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit"});
+}
+function fmtOdd(v){
+  if (v === null || v === undefined || isNaN(v)) return "—";
+  return Number(v).toLocaleString("pt-BR", {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function fmtEv(v){
+  if (v === null || v === undefined || isNaN(v)) return "—";
+  var n = Number(v);
+  return (n > 0 ? "+" : "") + fmtNum(n, 1) + "%";
+}
+function stakeDe(l){ var s = Number(l.stake_sim); return isNaN(s) || s <= 0 ? 100 : s; }
+
+/* Lucro simulado de uma linha liquidada, conforme as regras:
+   - retorno_sim presente: green -> retorno_sim - stake_sim (demais status: retorno_sim - stake_sim também, se houver)
+   - green sem retorno_sim: stake*(odd-1) | red: -stake | void: 0 | pendente: null */
+function lucroDe(l){
+  if (l.status === "pendente") return null;
+  var stake = stakeDe(l);
+  if (l.retorno_sim !== null && l.retorno_sim !== undefined && !isNaN(Number(l.retorno_sim))){
+    return Number(l.retorno_sim) - stake;
+  }
+  if (l.status === "green"){
+    var odd = Number(l.odd);
+    return isNaN(odd) ? 0 : stake * (odd - 1);
+  }
+  if (l.status === "red") return -stake;
+  if (l.status === "void") return 0;
+  return null;
+}
+function isLiquidada(l){ return l.status === "green" || l.status === "red" || l.status === "void"; }
+
+/* Agrega um conjunto de linhas (conta todas em "linhas"; métricas só nas liquidadas) */
+function agregar(arr){
+  var g = { linhas: arr.length, liq: 0, green: 0, red: 0, void: 0, volume: 0, lucro: 0, evSoma: 0, evQtd: 0 };
+  arr.forEach(function(l){
+    if (!isLiquidada(l)) return;
+    g.liq++;
+    if (l.status === "green") g.green++;
+    else if (l.status === "red") g.red++;
+    else if (l.status === "void") g.void++;
+    if (l.status === "green" || l.status === "red") g.volume += stakeDe(l);
+    var lu = lucroDe(l);
+    if (lu !== null) g.lucro += lu;
+    if (l.ev !== null && l.ev !== undefined && !isNaN(Number(l.ev))){ g.evSoma += Number(l.ev); g.evQtd++; }
+  });
+  g.winrate = (g.green + g.red) > 0 ? (g.green / (g.green + g.red)) * 100 : null;
+  g.roi = g.volume > 0 ? (g.lucro / g.volume) * 100 : null;
+  g.evMedio = g.evQtd > 0 ? g.evSoma / g.evQtd : null;
+  return g;
+}
+function classeValor(v){ return v === null || v === undefined ? "" : (v >= 0 ? "pos" : "neg"); }
+
+/* ---------- carregamento ---------- */
+function fetchJson(url){
+  return fetch(url, { headers: HEADERS }).then(function(r){
+    if (!r.ok) throw new Error("HTTP " + r.status + " em " + url);
+    return r.json();
+  });
+}
+function carregar(){
+  var btn = document.getElementById("btnAtualizar");
+  btn.disabled = true; btn.textContent = "⏳ Atualizando…";
+  document.getElementById("erroBox").style.display = "none";
+  var p1 = fetchJson(SUPABASE_URL + "/rest/v1/radar_linhas?select=*&order=capturada_em.desc&limit=5000");
+  var p2 = fetchJson(SUPABASE_URL + "/rest/v1/radar_varreduras?select=*&order=iniciada_em.desc&limit=20");
+  return Promise.all([p1, p2]).then(function(res){
+    LINHAS = Array.isArray(res[0]) ? res[0] : [];
+    VARREDURAS = Array.isArray(res[1]) ? res[1] : [];
+    renderTudo();
+  }).catch(function(e){
+    var box = document.getElementById("erroBox");
+    box.textContent = "⚠️ Não foi possível carregar os dados do Supabase: " + e.message;
+    box.style.display = "block";
+  }).then(function(){
+    btn.disabled = false; btn.textContent = "🔄 Atualizar";
+  });
+}
+
+/* ---------- renderização ---------- */
+function renderTudo(){
+  renderSubtitulo();
+  renderKpis();
+  popularEsportes();
+  renderLinhas();
+  renderAnalises();
+}
+function renderSubtitulo(){
+  var el = document.getElementById("subtitulo");
+  if (!VARREDURAS.length){ el.textContent = "Nenhuma varredura registrada ainda."; return; }
+  var v = VARREDURAS[0];
+  el.innerHTML = "Última varredura: <b>" + esc(fmtData(v.iniciada_em)) + "</b>" +
+    " · Linhas vistas: <b>" + esc(dash(v.linhas_vistas)) + "</b>" +
+    " · Linhas novas: <b>" + esc(dash(v.linhas_novas)) + "</b>";
+}
+function renderKpis(){
+  var total = LINHAS.length;
+  var pendentes = LINHAS.filter(function(l){ return l.status === "pendente"; }).length;
+  var liq = LINHAS.filter(isLiquidada);
+  var agg = agregar(LINHAS);
+  document.getElementById("kpiTotal").textContent = total.toLocaleString("pt-BR");
+  document.getElementById("kpiPendentes").textContent = pendentes.toLocaleString("pt-BR");
+  document.getElementById("kpiLiquidadas").textContent = liq.length.toLocaleString("pt-BR");
+  document.getElementById("kpiWinrate").textContent = fmtPct(agg.winrate);
+  var roiEl = document.getElementById("kpiRoi");
+  roiEl.textContent = fmtPct(agg.roi);
+  roiEl.className = "val " + classeValor(agg.roi);
+  var lucroEl = document.getElementById("kpiLucro");
+  lucroEl.textContent = fmtBRL(agg.lucro);
+  lucroEl.className = "val " + classeValor(agg.lucro);
+  document.getElementById("kpiEvMedio").textContent = agg.evMedio === null ? "—" : fmtEv(agg.evMedio);
+}
+function popularEsportes(){
+  var sel = document.getElementById("fEsporte");
+  var atual = sel.value;
+  var esportes = {};
+  LINHAS.forEach(function(l){ if (l.esporte) esportes[l.esporte] = true; });
+  var lista = Object.keys(esportes).sort();
+  sel.innerHTML = '<option value="">Esporte: todos</option>' + lista.map(function(e){
+    return '<option value="' + esc(e) + '">' + esc(e) + "</option>";
+  }).join("");
+  sel.value = atual;
+}
+
+/* ----- aba Linhas ----- */
+function linhasFiltradas(){
+  var busca = document.getElementById("fBusca").value.trim().toLowerCase();
+  var status = document.getElementById("fStatus").value;
+  var esporte = document.getElementById("fEsporte").value;
+  var tier = document.getElementById("fTier").value;
+  var fonte = document.getElementById("fFonte").value;
+  return LINHAS.filter(function(l){
+    if (status && l.status !== status) return false;
+    if (esporte && l.esporte !== esporte) return false;
+    if (tier && l.tier !== tier) return false;
+    if (fonte && l.fonte_coleta !== fonte) return false;
+    if (busca){
+      var alvo = [l.jogo, l.mercado, l.selecao, l.liga].filter(Boolean).join(" ").toLowerCase();
+      if (alvo.indexOf(busca) === -1) return false;
+    }
+    return true;
+  });
+}
+function chipStatus(st){
+  var mapa = { green:"GREEN", red:"RED", void:"VOID", pendente:"PENDENTE" };
+  var rot = mapa[st] || String(st || "—").toUpperCase();
+  var cls = (st === "green" || st === "red" || st === "void" || st === "pendente") ? st : "void";
+  return '<span class="chip ' + cls + '">' + esc(rot) + "</span>";
+}
+function renderLinhas(){
+  var arr = linhasFiltradas();
+  document.getElementById("contadorLinhas").textContent =
+    arr.length.toLocaleString("pt-BR") + " linha(s) exibida(s) de " + LINHAS.length.toLocaleString("pt-BR") + " no total";
+  var tb = document.getElementById("tbodyLinhas");
+  if (!arr.length){
+    tb.innerHTML = '<tr><td colspan="15" class="empty">Nenhuma linha encontrada com esses filtros.</td></tr>';
+    return;
+  }
+  tb.innerHTML = arr.map(function(l){
+    var det = [l.detalhe, l.placar].filter(function(x){ return x !== null && x !== undefined && x !== ""; }).join(" · ");
+    return "<tr>" +
+      "<td>" + esc(fmtData(l.capturada_em)) + "</td>" +
+      "<td>" + esc(fmtData(l.inicio_jogo)) + "</td>" +
+      "<td>" + esc(dash(l.esporte)) + "</td>" +
+      "<td>" + esc(dash(l.liga)) + "</td>" +
+      '<td class="wrap">' + esc(dash(l.jogo)) + "</td>" +
+      '<td class="wrap">' + esc(dash(l.mercado)) + "</td>" +
+      '<td class="wrap">' + esc(dash(l.selecao)) + "</td>" +
+      "<td>" + esc(dash(l.periodo)) + "</td>" +
+      "<td>" + (l.tier ? '<span class="tier">' + esc(l.tier) + "</span>" : "—") + "</td>" +
+      '<td class="num">' + esc(fmtOdd(l.odd)) + "</td>" +
+      '<td class="num">' + esc(fmtEv(l.ev)) + "</td>" +
+      '<td class="num">' + esc(fmtOdd(l.odd_fair)) + "</td>" +
+      '<td class="num">' + (l.clv === null || l.clv === undefined ? "—" : esc(fmtEv(l.clv))) + "</td>" +
+      "<td>" + chipStatus(l.status) + "</td>" +
+      '<td class="det">' + (det ? esc(det) : "—") + "</td>" +
+      "</tr>";
+  }).join("");
+}
+
+/* ----- aba Análises ----- */
+function agruparPor(arr, fnChave){
+  var mapa = {};
+  arr.forEach(function(l){
+    var k = fnChave(l);
+    if (k === null || k === undefined || k === "") k = "—";
+    if (!mapa[k]) mapa[k] = [];
+    mapa[k].push(l);
+  });
+  return mapa;
+}
+function faixaEv(l){
+  var ev = Number(l.ev);
+  if (l.ev === null || l.ev === undefined || isNaN(ev)) return "Sem EV";
+  if (ev < 5) return "3–5";
+  if (ev < 8) return "5–8";
+  if (ev < 12) return "8–12";
+  return "12+";
+}
+function faixaOdd(l){
+  var o = Number(l.odd);
+  if (l.odd === null || l.odd === undefined || isNaN(o)) return "Sem odd";
+  if (o < 1.70) return "1.40–1.70";
+  if (o < 2.00) return "1.70–2.00";
+  if (o < 2.50) return "2.00–2.50";
+  return "2.50–4.00";
+}
+function tabelaAnalise(titulo, mapa, liquidadas){
+  var chaves = Object.keys(mapa);
+  var linhasAgg = chaves.map(function(k){ return { chave: k, agg: agregar(mapa[k]) }; });
+  linhasAgg.sort(function(a, b){
+    var ra = a.agg.roi === null ? -Infinity : a.agg.roi;
+    var rb = b.agg.roi === null ? -Infinity : b.agg.roi;
+    return rb - ra;
+  });
+  function celulaAgg(a){
+    return "<td>" + a.linhas.toLocaleString("pt-BR") + "</td>" +
+      "<td>" + a.liq.toLocaleString("pt-BR") + "</td>" +
+      '<td class="pos">' + a.green.toLocaleString("pt-BR") + "</td>" +
+      '<td class="neg">' + a.red.toLocaleString("pt-BR") + "</td>" +
+      "<td>" + a.void.toLocaleString("pt-BR") + "</td>" +
+      "<td>" + fmtPct(a.winrate) + "</td>" +
+      '<td class="num">' + fmtBRL(a.volume) + "</td>" +
+      '<td class="num ' + classeValor(a.lucro) + '">' + fmtBRL(a.lucro) + "</td>" +
+      '<td class="num ' + classeValor(a.roi) + '">' + fmtPct(a.roi) + "</td>";
+  }
+  var corpo = linhasAgg.map(function(item){
+    return "<tr><td>" + esc(item.chave) + "</td>" + celulaAgg(item.agg) + "</tr>";
+  }).join("");
+  var total = agregar(liquidadas);
+  total.linhas = liquidadas.length;
+  var rodape = "<tr><td>TOTAL</td>" + celulaAgg(total) + "</tr>";
+  return '<h3 class="an">' + esc(titulo) + "</h3>" +
+    '<div class="tblwrap"><table><thead><tr>' +
+    "<th>Recorte</th><th>Linhas</th><th>Liquidadas</th><th>Green</th><th>Red</th><th>Void</th><th>Winrate</th>" +
+    '<th class="num">Volume sim (R$)</th><th class="num">Lucro sim (R$)</th><th class="num">ROI</th>' +
+    "</tr></thead><tbody>" + corpo + "</tbody><tfoot>" + rodape + "</tfoot></table></div>";
+}
+function renderAnalises(){
+  var cont = document.getElementById("analisesConteudo");
+  var liquidadas = LINHAS.filter(isLiquidada);
+  if (!liquidadas.length){
+    cont.innerHTML = '<div class="empty">Ainda não há linhas liquidadas para analisar. As análises aparecem assim que as primeiras linhas forem liquidadas (green/red/void).</div>';
+    return;
+  }
+  var porLiga = agruparPor(liquidadas, function(l){ return l.liga; });
+  var topLigas = Object.keys(porLiga).sort(function(a, b){ return porLiga[b].length - porLiga[a].length; }).slice(0, 15);
+  var mapaTopLigas = {};
+  topLigas.forEach(function(k){ mapaTopLigas[k] = porLiga[k]; });
+
+  cont.innerHTML =
+    tabelaAnalise("⚽ Por esporte", agruparPor(liquidadas, function(l){ return l.esporte; }), liquidadas) +
+    tabelaAnalise("🎯 Por mercado", agruparPor(liquidadas, function(l){ return l.mercado; }), liquidadas) +
+    tabelaAnalise("🧩 Por tipo de mercado", agruparPor(liquidadas, function(l){ return l.tipo_mercado; }), liquidadas) +
+    tabelaAnalise("🏅 Por Tier", agruparPor(liquidadas, function(l){ return l.tier; }), liquidadas) +
+    tabelaAnalise("📈 Por faixa de EV", agruparPor(liquidadas, faixaEv), liquidadas) +
+    tabelaAnalise("🎲 Por faixa de odd", agruparPor(liquidadas, faixaOdd), liquidadas) +
+    tabelaAnalise("🏆 Por liga (top 15 por nº de liquidadas)", mapaTopLigas, liquidadas);
+}
+
+/* ---------- eventos ---------- */
+document.getElementById("btnAtualizar").addEventListener("click", carregar);
+["fBusca", "fStatus", "fEsporte", "fTier", "fFonte"].forEach(function(id){
+  var el = document.getElementById(id);
+  el.addEventListener("input", renderLinhas);
+  el.addEventListener("change", renderLinhas);
+});
+document.querySelectorAll(".tab").forEach(function(tab){
+  tab.addEventListener("click", function(){
+    document.querySelectorAll(".tab").forEach(function(t){ t.classList.remove("active"); });
+    document.querySelectorAll("section.panel").forEach(function(p){ p.classList.remove("active"); });
+    tab.classList.add("active");
+    document.getElementById(tab.getAttribute("data-aba") === "linhas" ? "panelLinhas" : "panelAnalises").classList.add("active");
+  });
+});
+
+carregar();
+</script>
+</body>
+</html>
